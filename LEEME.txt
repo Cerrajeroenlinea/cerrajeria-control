@@ -1,0 +1,23 @@
+APP DE CERrajería — PRIMERA VERSIÓN
+=====================================
+
+Incluye:
+- Servicios y clientes con estado, precio, anticipo y saldo.
+- Inventario de productos/materiales con entradas y salidas.
+- Registro de ventas y descuento automático del stock cuando se elige un producto.
+- Registro de gastos y resumen de caja.
+- Exportación e importación de respaldos JSON.
+- Interfaz adaptable a Android.
+
+IMPORTANTE:
+Esta es una primera versión local. Los datos se guardan en el almacenamiento del navegador del dispositivo. No existe sincronización en la nube ni acceso multiusuario. Haz respaldos frecuentes. No borres los datos del sitio sin exportar antes.
+
+CÓMO PROBAR EN ANDROID:
+1. Extrae todos los archivos del ZIP.
+2. Para instalarla como PWA, los archivos deben publicarse en un hosting HTTPS (por ejemplo, un hosting estático). Abrir index.html directamente no permite instalarla como app PWA ni garantiza el funcionamiento sin conexión.
+3. Abre la dirección HTTPS en Chrome para Android.
+4. En el menú de Chrome, elige “Instalar aplicación” o “Agregar a pantalla principal”.
+5. Abre la app y exporta un respaldo después de cargar información importante.
+
+NOTA TÉCNICA:
+La app es una base funcional para validar el flujo. Antes de usarla como sistema definitivo, conviene añadir iconos, edición completa de productos, historial de movimientos de inventario, pagos parciales de ventas, reportes por periodo, protección con PIN y pruebas de recuperación de datos.

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102a43">
+<title>Cerrajería | Control</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--navy:#102a43;--blue:#1769aa;--yellow:#ffc928;--bg:#f3f6fa;--ink:#172b4d;--muted:#62748a;--line:#dce4ed;--green:#16835c;--red:#bd3434}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:var(--navy);color:#fff;padding:18px 16px 14px;position:sticky;top:0;z-index:3}
+header h1{font-size:20px;margin:0}header p{margin:4px 0 0;color:#d5e4f2;font-size:12px}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:67px;z-index:2}
+nav button{border:0;border-radius:10px;padding:10px 12px;background:#edf2f7;color:var(--navy);font-weight:650;white-space:nowrap}
+nav button.active{background:var(--yellow)}
+main{max-width:900px;margin:auto;padding:14px}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat,.panel,.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.stat small{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:23px;display:block;margin-top:4px}
+h2{font-size:18px;margin:8px 0 12px}h3{font-size:15px;margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 5px}
+input,select,textarea{width:100%;border:1px solid #cbd6e2;border-radius:9px;padding:11px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:65px;resize:vertical}
+button.primary{background:var(--blue);color:white;border:0;border-radius:10px;padding:12px 14px;font-weight:700;width:100%;margin-top:12px}
+button.secondary,button.danger{border:0;border-radius:8px;padding:8px 10px;font-weight:650;margin:3px 3px 0 0}
+button.secondary{background:#eaf1f8;color:var(--navy)}button.danger{background:#fff0f0;color:var(--red)}
+.item{padding:12px}.item strong{display:block}.meta{color:var(--muted);font-size:12px;margin-top:4px}.pill{display:inline-block;background:#fff4c7;color:#624c00;border-radius:99px;padding:3px 8px;font-size:11px;margin-top:6px}
+.row{display:flex;gap:8px}.row>*{flex:1}.empty{color:var(--muted);padding:15px;text-align:center}
+.note{font-size:12px;color:var(--muted);line-height:1.5}.money{color:var(--green)}.danger-text{color:var(--red)}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.forms{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.forms .wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><h1>🔑 Cerrajería · Control</h1><p>Servicios · Ventas · Inventario · Caja</p></header>
+<nav id="nav">
+<button class="active" data-page="inicio">Inicio</button><button data-page="servicios">Servicios</button><button data-page="inventario">Inventario</button><button data-page="ventas">Ventas</button><button data-page="caja">Caja</button><button data-page="respaldo">Respaldo</button>
+</nav>
+<main>
+<section id="inicio" class="page active">
+<h2>Resumen de hoy</h2>
+<div class="grid">
+<div class="stat"><small>Servicios abiertos</small><strong id="sOpen">0</strong></div>
+<div class="stat"><small>Ventas registradas</small><strong id="sSales">$0</strong></div>
+<div class="stat"><small>Gastos registrados</small><strong id="sExpenses">$0</strong></div>
+<div class="stat"><small>Existencias bajas</small><strong id="sLow">0</strong></div>
+</div>
+<div class="panel"><h3>Acciones rápidas</h3><div class="row"><button class="primary" onclick="go('servicios')">＋ Nuevo servicio</button><button class="primary" onclick="go('ventas')">＋ Nueva venta</button></div></div>
+<div class="panel"><h3>Servicios recientes</h3><div id="recent"></div></div>
+<div class="panel"><h3>Productos por reponer</h3><div id="lowList"></div></div>
+<p class="note">Los datos se guardan en este dispositivo. Haz respaldos periódicos en la sección “Respaldo”. Esta primera versión no sincroniza datos entre dispositivos.</p>
+</section>
+<section id="servicios" class="page">
+<h2>Servicios y clientes</h2>
+<div class="panel"><h3>Registrar servicio</h3>
+<form id="serviceForm" class="forms">
+<div><label>Cliente *</label><input name="client" required placeholder="Nombre del cliente"></div>
+<div><label>Teléfono / WhatsApp</label><input name="phone" inputmode="tel" placeholder="Número de contacto"></div>
+<div><label>Tipo de servicio *</label><select name="type"><option>Apertura residencial</option><option>Apertura automotriz</option><option>Cambio de cilindro</option><option>Instalación de chapa</option><option>Duplicado de llave</option><option>Reparación de cerradura</option><option>Cerradura inteligente</option><option>Otro</option></select></div>
+<div><label>Estado</label><select name="status"><option>Pendiente</option><option>Agendado</option><option>En proceso</option><option>Terminado</option><option>Cancelado</option></select></div>
+<div class="wide"><label>Domicilio / referencia</label><input name="address" placeholder="Dirección, colonia o referencia"></div>
+<div><label>Precio acordado ($)</label><input name="price" type="number" min="0" step=".01" value="0"></div>
+<div><label>Anticipo recibido ($)</label><input name="deposit" type="number" min="0" step=".01" value="0"></div>
+<div class="wide"><label>Notas</label><textarea name="notes" placeholder="Materiales, horario, detalles..."></textarea></div>
+<div class="wide"><button class="primary" type="submit">Guardar servicio</button></div>
+</form></div>
+<div id="serviceList"></div>
+</section>
+<section id="inventario" class="page">
+<h2>Inventario</h2>
+<div class="panel"><h3>Agregar producto o material</h3>
+<form id="productForm" class="forms">
+<div><label>Producto *</label><input name="name" required placeholder="Ej. Cilindro estándar"></div>
+<div><label>Categoría</label><select name="category"><option>Chapas y cilindros</option><option>Llaves y blanks</option><option>Automotriz</option><option>Herramientas</option><option>Accesorios</option><option>Otros</option></select></div>
+<div><label>Cantidad inicial</label><input name="qty" type="number" min="0" step="1" value="0"></div>
+<div><label>Stock mínimo</label><input name="min" type="number" min="0" step="1" value="2"></div>
+<div><label>Costo unitario ($)</label><input name="cost" type="number" min="0" step=".01" value="0"></div>
+<div><label>Precio de venta ($)</label><input name="price" type="number" min="0" step=".01" value="0"></div>
+<div class="wide"><button class="primary" type="submit">Guardar producto</button></div>
+</form></div>
+<div id="productList"></div>
+</section>
+<section id="ventas" class="page">
+<h2>Ventas</h2>
+<div class="panel"><h3>Registrar venta</h3>
+<form id="saleForm" class="forms">
+<div><label>Producto (opcional)</label><select name="product" id="saleProduct"><option value="">Solo mano de obra / otro</option></select></div>
+<div><label>Descripción *</label><input name="description" required placeholder="Ej. Duplicado o servicio"></div>
+<div><label>Cantidad</label><input name="qty" type="number" min="1" step="1" value="1"></div>
+<div><label>Total cobrado ($) *</label><input name="total" type="number" min="0" step=".01" required></div>
+<div><label>Forma de pago</label><select name="payment"><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Por cobrar</option></select></div>
+<div><label>Cliente (opcional)</label><input name="client" placeholder="Nombre"></div>
+<div class="wide"><button class="primary" type="submit">Registrar venta</button></div>
+</form><p class="note">Al elegir un producto se descontará la cantidad del inventario. Revisa que el stock sea correcto antes de guardar.</p></div>
+<div id="saleList"></div>
+</section>
+<section id="caja" class="page">
+<h2>Caja y gastos</h2>
+<div class="grid">
+<div class="stat"><small>Ingresos cobrados</small><strong id="cashIn">$0</strong></div>
+<div class="stat"><small>Gastos</small><strong id="cashOut">$0</strong></div>
+<div class="stat"><small>Saldo neto registrado</small><strong id="cashNet">$0</strong></div>
+<div class="stat"><small>Servicios por cobrar</small><strong id="toCollect">$0</strong></div>
+</div>
+<div class="panel"><h3>Registrar gasto o compra</h3><form id="expenseForm">
+<label>Concepto *</label><input name="description" required placeholder="Ej. Compra de cilindros">
+<div class="row"><div><label>Monto ($) *</label><input name="amount" type="number" min="0" step=".01" required></div><div><label>Tipo</label><select name="type"><option>Compra de material</option><option>Combustible</option><option>Herramientas</option><option>Teléfono / internet</option><option>Otro gasto</option></select></div></div>
+<label>Forma de pago</label><select name="payment"><option>Efectivo</option><option>Transferencia</option></select><button class="primary">Guardar gasto</button></form></div>
+<div id="expenseList"></div>
+</section>
+<section id="respaldo" class="page">
+<h2>Respaldo de datos</h2>
+<div class="panel"><h3>Exportar</h3><p class="note">Descarga un archivo con tus servicios, inventario, ventas y gastos para conservar una copia.</p><button class="primary" onclick="exportData()">Descargar respaldo</button></div>
+<div class="panel"><h3>Importar respaldo</h3><p class="note">Importar reemplaza los datos actuales de esta app. Exporta primero una copia antes de hacerlo.</p><input id="importFile" type="file" accept="application/json"><button class="primary" onclick="importData()">Importar y reemplazar datos</button></div>
+<div class="panel"><h3>Información importante</h3><p class="note">Los datos se guardan localmente en este navegador. Si borras los datos del navegador, desinstalas la app o cambias de teléfono, podrías perderlos. Exporta respaldos con frecuencia. Esta versión no genera facturas fiscales ni envía mensajes automáticamente.</p></div>
+</section>
+</main>
+<script>
+const KEY='cerrajeria_control_v1';
+let db=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{services:[],products:[],sales:[],expenses:[]}}catch(e){return {services:[],products:[],sales:[],expenses:[]}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function money(n){return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(n)||0)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function today(x){return new Date(x).toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})}
+function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===page));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));window.scrollTo(0,0);if(page==='ventas')fillProducts()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+document.getElementById('serviceForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.services.unshift({id:id(),date:Date.now(),client:f.get('client'),phone:f.get('phone'),type:f.get('type'),status:f.get('status'),address:f.get('address'),price:+f.get('price'),deposit:+f.get('deposit'),notes:f.get('notes')});e.target.reset();e.target.querySelector('[name=price]').value=0;e.target.querySelector('[name=deposit]').value=0;save();alert('Servicio guardado')};
+document.getElementById('productForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.products.unshift({id:id(),name:f.get('name'),category:f.get('category'),qty:+f.get('qty'),min:+f.get('min'),cost:+f.get('cost'),price:+f.get('price')});e.target.reset();save();alert('Producto guardado')};
+document.getElementById('saleForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target),p=db.products.find(x=>x.id===f.get('product')),q=+f.get('qty');if(p&&p.qty<q){alert('No hay suficiente existencia. Disponible: '+p.qty);return}if(p)p.qty-=q;db.sales.unshift({id:id(),date:Date.now(),productId:p?.id||'',description:f.get('description'),qty:q,total:+f.get('total'),payment:f.get('payment'),client:f.get('client'),cost:p?p.cost*q:0});e.target.reset();e.target.querySelector('[name=qty]').value=1;save();fillProducts();alert('Venta registrada')};
+document.getElementById('expenseForm').onsubmit=e=>{e.preventDefault();let f=new FormData(e.target);db.expenses.unshift({id:id(),date:Date.now(),description:f.get('description'),amount:+f.get('amount'),type:f.get('type'),payment:f.get('payment')});e.target.reset();save();alert('Gasto guardado')};
+function fillProducts(){let s=document.getElementById('saleProduct'),old=s.value;s.innerHTML='<option value="">Solo mano de obra / otro</option>'+db.products.map(p=>`<option value="${p.id}">${esc(p.name)} · stock ${p.qty}</option>`).join('');if([...s.options].some(o=>o.value===old))s.value=old}
+function setStatus(idv,status){let x=db.services.find(s=>s.id===idv);if(x){x.status=status;save()}}
+function del(type,idv){if(!confirm('¿Eliminar este registro?'))return;db[type]=db[type].filter(x=>x.id!==idv);save()}
+function render(){
+let open=db.services.filter(s=>!['Terminado','Cancelado'].includes(s.status)).length;
+let sales=db.sales.filter(s=>s.payment!=='Por cobrar').reduce((a,s)=>a+s.total,0);
+let exp=db.expenses.reduce((a,x)=>a+x.amount,0);
+let low=db.products.filter(p=>p.qty<=p.min);
+document.getElementById('sOpen').textContent=open;document.getElementById('sSales').textContent=money(sales);document.getElementById('sExpenses').textContent=money(exp);document.getElementById('sLow').textContent=low.length;
+document.getElementById('recent').innerHTML=db.services.slice(0,4).map(serviceCard).join('')||'<div class="empty">Todavía no hay servicios registrados.</div>';
+document.getElementById('lowList').innerHTML=low.map(p=>`<div class="item"><strong>${esc(p.name)}</strong><div class="meta">Quedan ${p.qty} · mínimo ${p.min}</div></div>`).join('')||'<div class="empty">No hay productos por reponer.</div>';
+document.getElementById('serviceList').innerHTML=db.services.map(serviceCard).join('')||'<div class="empty">No hay servicios todavía.</div>';
+document.getElementById('productList').innerHTML=db.products.map(p=>`<div class="item"><strong>${esc(p.name)} ${p.qty<=p.min?'<span class="pill">Stock bajo</span>':''}</strong><div class="meta">${esc(p.category)} · Existencia: ${p.qty} · Costo: ${money(p.cost)} · Venta: ${money(p.price)}</div><button class="secondary" onclick="adjust('${p.id}',1)">＋ Entrada</button><button class="secondary" onclick="adjust('${p.id}',-1)">− Salida</button><button class="secondary" onclick="editProduct('${p.id}')">Editar</button><button class="danger" onclick="del('products','${p.id}')">Eliminar</button></div>`).join('')||'<div class="empty">Agrega tus chapas, cilindros, llaves y materiales.</div>';
+document.getElementById('saleList').innerHTML=db.sales.map(s=>`<div class="item"><strong>${esc(s.description)} · ${money(s.total)}</strong><div class="meta">${today(s.date)} · ${esc(s.client||'Sin cliente')} · ${esc(s.payment)}${s.payment==='Por cobrar'?' · pendiente de cobro':''}</div><button class="danger" onclick="del('sales','${s.id}')">Eliminar</button></div>`).join('')||'<div class="empty">No hay ventas registradas.</div>';
+document.getElementById('expenseList').innerHTML=db.expenses.map(x=>`<div class="item"><strong>${esc(x.description)} · ${money(x.amount)}</strong><div class="meta">${today(x.date)} · ${esc(x.type)} · ${esc(x.payment)}</div><button class="danger" onclick="del('expenses','${x.id}')">Eliminar</button></div>`).join('')||'<div class="empty">No hay gastos registrados.</div>';
+let inCash=sales,out=exp,collect=db.services.reduce((a,s)=>a+Math.max(0,s.price-s.deposit),0)+db.sales.filter(s=>s.payment==='Por cobrar').reduce((a,s)=>a+s.total,0);
+document.getElementById('cashIn').textContent=money(inCash);document.getElementById('cashOut').textContent=money(out);document.getElementById('cashNet').textContent=money(inCash-out);document.getElementById('toCollect').textContent=money(collect);fillProducts()
+}
+function serviceCard(s){let balance=Math.max(0,s.price-s.deposit);return `<div class="item"><strong>${esc(s.client)} · ${esc(s.type)}</strong><div class="meta">${today(s.date)} · ${esc(s.phone||'Sin teléfono')} · ${esc(s.address||'Sin domicilio')}</div><span class="pill">${esc(s.status)}</span><div class="meta">Precio ${money(s.price)} · Anticipo ${money(s.deposit)} · Saldo ${money(balance)}</div>${s.notes?`<div class="meta">${esc(s.notes)}</div>`:''}${s.phone?`<button class="secondary" onclick="window.open('https://wa.me/52'+('${esc(s.phone)}'.replace(/\\D/g,'')),'_blank')">WhatsApp</button>`:''}<button class="secondary" onclick="nextStatus('${s.id}')">Cambiar estado</button><button class="secondary" onclick="editService('${s.id}')">Editar</button><button class="danger" onclick="del('services','${s.id}')">Eliminar</button></div>`}
+function nextStatus(i){let x=db.services.find(s=>s.id===i);let opts=['Pendiente','Agendado','En proceso','Terminado','Cancelado'];let v=prompt('Nuevo estado:\n'+opts.map((o,n)=>(n+1)+'. '+o).join('\n'),String(opts.indexOf(x.status)+1));if(v&&opts[+v-1])setStatus(i,opts[+v-1])}
+function adjust(i,delta){let p=db.products.find(x=>x.id===i),v=prompt((delta>0?'Cantidad que entra':'Cantidad que sale')+' de '+p.name,'1');if(v===null)return;let n=parseInt(v);if(!Number.isFinite(n)||n<=0)return alert('Ingresa una cantidad válida');if(delta<0&&p.qty<n)return alert('No hay suficiente stock');p.qty+=delta*n;save()}
+function editProduct(i){let p=db.products.find(x=>x.id===i),name=prompt('Nombre del producto',p.name);if(name===null)return;let qty=prompt('Existencia actual',p.qty);if(qty===null)return;p.name=name;p.qty=Math.max(0,parseInt(qty)||0);let price=prompt('Precio de venta',p.price);if(price!==null)p.price=Math.max(0,parseFloat(price)||0);save()}
+function editService(i){let s=db.services.find(x=>x.id===i);let price=prompt('Precio acordado',s.price);if(price===null)return;let deposit=prompt('Anticipo recibido',s.deposit);if(deposit===null)return;s.price=Math.max(0,parseFloat(price)||0);s.deposit=Math.max(0,parseFloat(deposit)||0);let phone=prompt('Teléfono',s.phone);if(phone!==null)s.phone=phone;save()}
+function exportData(){let blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),data:db},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='respaldo-cerrajeria-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url)}
+function importData(){let f=document.getElementById('importFile').files[0];if(!f)return alert('Selecciona un archivo de respaldo');let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result),d=o.data||o;if(!d.services||!d.products||!d.sales||!d.expenses)throw 0;if(!confirm('Esto reemplazará todos los datos actuales. ¿Continuar?'))return;db=d;save();alert('Respaldo importado')}catch(e){alert('Archivo de respaldo inválido')}};r.readAsText(f)}
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
